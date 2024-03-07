@@ -1,7 +1,9 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const cookieParser = require('cookie-parser');
 const connectDb = require("./config/db");
-const userRouters = require("./routers/userRouter")
+const userRouters = require("./routers/userRouter");
+
 const { notFound, errorHandler } = require("./middleware/errrorMiddleware");
 dotenv.config();
 
@@ -14,6 +16,9 @@ const app = express();
 //body Parser middleware..
 app.use(express.json());
 
+// Use cookie-parser middleware
+app.use(cookieParser());
+
 // that will allow us to send form data
 app.use(express.urlencoded({ extended: true }));
  
@@ -21,7 +26,7 @@ app.use('/api/users', userRouters);
 
 app.get('/', (req, res) => res.send("Server is Running"));
 
-// middleware custom error
+// middleware custom error 
 app.use(notFound);
 app.use(errorHandler);
 
