@@ -13,6 +13,7 @@ const port = process.env.PORT || 5000;
 
 
 const app = express();
+app.use(express.static('static')); 
 
 //body Parser middleware..
 app.use(express.json());
@@ -24,6 +25,14 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
  
 app.use('/api/users', userRouters);
+
+// gitHub login page
+app.get('/', (req, res) => {
+    res.send(`
+    <h1>Welcome to the GitHub Login Page</h1>
+    <a id="sign-in-with-github" href="/api/users/auth">Sign in with GitHub</a>
+    `);
+});  
 
 app.get('/', (req, res) => res.send("Server is Running"));
 

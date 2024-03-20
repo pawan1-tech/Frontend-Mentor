@@ -2,7 +2,6 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModels");
 const generateToken = require("../utils/generateToken");
 
-
 // @desc Auth user/set token
 // route POST /api/users/auth
 // @access Public
@@ -24,6 +23,41 @@ const authUser = asyncHandler( async (req, res) => {
     }
     // res.status(200).json({ message: 'Auth User'}); 
 });
+
+// @desc Auth user/set gitHub
+// route get /api/users/auth
+// @access Public
+const gitHubAuthuser =asyncHandler( async  (req, res) => {
+    res.redirect(`https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}`)
+});
+
+const oAuthCallback =asyncHandler( async (req, res) => {
+    const clientId = process.env.GITHUB_CLIENT_ID;
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+    const redirectUri = process.env.REDIRECT_URI;
+    const code = req.query.code;
+  
+    try {
+      const response = await axios.post('https://github.com/login/oauth/access_token', {
+        client_id: clientId,
+        client_secret: clientSecret,
+        code: code,
+        redirect_uri: redirectUri,
+      }, {
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+  
+      const accessToken = response.data.access_token;
+      // Use the access token to make API requests on behalf of the user
+      res.send(`<h1>Login Sucessful</h1> Access token: ${accessToken}`);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error during authentication.');
+    }
+  });
+
 
 
 // @desc    Register a new user
@@ -86,6 +120,7 @@ const getUserProfile = asyncHandler( async (req, res) => {
 });
 
 
+
 // @desc    Update profile
 // route    PUT /api/users/profile
 // @access  private
@@ -113,7 +148,7 @@ const updateUser = asyncHandler( async (req, res) => {
     
 });
 
-module.exports = { authUser, registerUser, logoutUser, getUserProfile, updateUser }; 
+module.exports = { authUser,gitHubAuthuser,oAuthCallback, registerUser, logoutUser, getUserProfile, updateUser }; 
 
 
 
